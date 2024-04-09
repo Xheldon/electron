@@ -1,0 +1,42 @@
+name: Publish MacOS
+
+on:
+  workflow_dispatch:
+    inputs:
+      macos-publish-arch-limit:
+        description: 'The allowed arches for macos-publish'
+        type: choice
+        default: all
+        options: ["all", "osx-x64", "osx-arm64", "mas-x64", "mas-arm64"]
+      upload-to-storage:
+        description: 'True to print to STDOUT'
+        # TODO(vertedinde): make this true and provide it
+        required: false 
+        default: '0'
+        type: string
+      run-macos-publish:
+        description: 'Run the publish jobs vs just the build jobs'
+        type: boolean
+        default: false
+    secrets:
+      IS_RELEASE: true
+      GN_CONFIG: //electron/build/args/release.gn
+      STRIP_BINARIES: true
+      GENERATE_SYMBOLS: true
+      CHECK_DIST_MANIFEST: '1'
+      UPLOAD_TO_STORAGE: '1'
+
+jobs:
+  publish:
+    uses: electron/electron/.github/workflows/macos-build.yml@gh-macos-publish
+    secrets:
+      AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT }}
+      AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
+      AZURE_STORAGE_CONTAINER_NAME: ${{ secrets.AZURE_STORAGE_CONTAINER_NAME }}
+      ELECTRON_RBE_JWT: ${{ secrets.ELECTRON_RBE_JWT }}
+      IS_RELEASE: ${{ secrets.IS_RELEASE }}
+      GN_CONFIG: ${{ secrets.GN_CONFIG }}
+      STRIP_BINARIES: ${{ secrets.STRIP_BINARIES }}
+      GENERATE_SYMBOLS: ${{ secrets.GENERATE_SYMBOLS }}
+      CHECK_DIST_MANIFEST: ${{ secrets.CHECK_DIST_MANIFEST }}
+      UPLOAD_TO_STORAGE: ${{ secrets.UPLOAD_TO_STORAGE }}
